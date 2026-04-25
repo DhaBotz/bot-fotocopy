@@ -1,0 +1,13 @@
+{
+  "name": "bot-fotocopy-pro",
+  "version": "1.0.0",
+  "description": "Bot WA Toko Fotocopy (cart + checkout)",
+  "main": "index.js",
+  "type": "module",
+  "scripts": { "start": "node index.js" },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.0",
+    "pino": "^8.0.0",
+    "qrcode-terminal": "^0.12.0"
+  }
+}
