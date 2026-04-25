@@ -40,7 +40,7 @@ function cartText(cart) {
 
 // ====== BOT ======
 async function startBot() {
-  const { state, saveCreds } = await useMultiFileAuthState("session");
+  const { state, saveCreds } = await useMultiFileAuthState("/session");
 
   const sock = makeWASocket({
     auth: state,
