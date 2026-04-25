@@ -16,14 +16,11 @@ const HARGA = {
 }
 
 // =====================
-// AUTO STICKER
+// STICKER FUNCTION
 // =====================
 async function createSticker(buffer) {
   return await sharp(buffer)
-    .resize(512, 512, {
-      fit: "contain",
-      background: { r: 0, g: 0, b: 0, alpha: 0 }
-    })
+    .resize(512, 512, { fit: "contain" })
     .webp()
     .toBuffer()
 }
@@ -32,11 +29,12 @@ async function createSticker(buffer) {
 // START BOT
 // =====================
 async function startBot() {
-  const { state, saveCreds } = await useMultiFileAuthState(".yud/session")
+  const { state, saveCreds } = await useMultiFileAuthState("./session")
 
   const sock = makeWASocket({
     auth: state,
-    printQRInTerminal: false
+    printQRInTerminal: false,
+    browser: ["Ubuntu", "Chrome", "22.04.4"]
   })
 
   sock.ev.on("creds.update", saveCreds)
@@ -44,18 +42,23 @@ async function startBot() {
   // =====================
   // CONNECTION
   // =====================
-  sock.ev.on("connection.update", (update) => {
-    const { connection, qr } = update
+  sock.ev.on("connection.update", (u) => {
+    const { connection, qr } = u
 
     if (qr) console.log("SCAN QR:", qr)
 
     if (connection === "open") {
-      console.log("🤖 BOT FOTOCOPY PRO AKTIF")
+      console.log("🤖 BOT FOTOCOPY PRO ONLINE")
+    }
+
+    if (connection === "close") {
+      console.log("RECONNECT...")
+      startBot()
     }
   })
 
   // =====================
-  // HANDLER
+  // MESSAGE HANDLER
   // =====================
   sock.ev.on("messages.upsert", async ({ messages }) => {
     const msg = messages[0]
@@ -76,11 +79,12 @@ async function startBot() {
     // =====================
     if (text === "menu") {
       return await sock.sendMessage(from, {
-        text: "📌 *AMIL JAYA FOTOCOPY*",
-        buttons: [
-          { buttonId: "harga", buttonText: { displayText: "💰 Harga" }, type: 1 },
-          { buttonId: "order", buttonText: { displayText: "🛒 Order" }, type: 1 }
-        ]
+        text:
+          "📌 *AMIL JAYA FOTOCOPY*\n\n" +
+          "menu:\n" +
+          "- harga\n" +
+          "- order\n" +
+          "- print 10 bw"
       })
     }
 
@@ -90,17 +94,18 @@ async function startBot() {
     if (text === "harga") {
       return await sock.sendMessage(from, {
         text:
-          "💰 *DAFTAR HARGA*\n\n" +
-          `- BW: Rp${HARGA.bw}\n` +
-          `- Color: Rp${HARGA.color}`
+          "💰 *HARGA*\n\n" +
+          `BW: Rp${HARGA.bw}\n` +
+          `Color: Rp${HARGA.color}`
       })
     }
 
     // =====================
-    // AUTO HARGA PRINT
+    // AUTO HITUNG
     // =====================
     if (text && text.startsWith("print")) {
       const args = text.split(" ")
+
       const jumlah = parseInt(args[1]) || 0
       const jenis = args[2]
 
@@ -109,7 +114,7 @@ async function startBot() {
 
       return await sock.sendMessage(from, {
         text:
-          `🧾 *STRUK FOTOCOPY*\n\n` +
+          `🧾 STRUK\n\n` +
           `Jenis: ${jenis}\n` +
           `Jumlah: ${jumlah}\n` +
           `Total: Rp${total}`
@@ -121,7 +126,7 @@ async function startBot() {
     // =====================
     if (text === "order") {
       return await sock.sendMessage(from, {
-        text: "📦 Kirim file atau foto untuk dicetak"
+        text: "📦 Kirim foto atau file untuk dicetak"
       })
     }
 
