@@ -50,22 +50,26 @@ async function startBot() {
   sock.ev.on("creds.update", saveCreds);
 
   sock.ev.on("connection.update", (u) => {
-    const { connection, lastDisconnect, qr } = u;
+  const { connection, lastDisconnect, qr } = u;
 
-    if (qr) {
-      console.log("\n📱 Scan QR:\n");
-      qrcode.generate(qr, { small: true });
-    }
+  console.log("STATUS:", connection); // 🔥 ini penting
 
-    if (connection === "open") console.log("✅ Bot siap");
+  if (qr) {
+    console.log("\n📱 SCAN QR INI:\n");
+    qrcode.generate(qr, { small: true });
+  }
 
-    if (connection === "close") {
-      const reconnect =
-        lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
-      if (reconnect) startBot();
-    }
-  });
+  if (connection === "open") {
+    console.log("✅ Bot siap digunakan");
+  }
 
+  if (connection === "close") {
+    console.log("🔁 Reconnecting...");
+    const reconnect =
+      lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
+    if (reconnect) startBot();
+  }
+});
   sock.ev.on("messages.upsert", async ({ messages }) => {
     const msg = messages[0];
     if (!msg.message || msg.key.fromMe) return;
