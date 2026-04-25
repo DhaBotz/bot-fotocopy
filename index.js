@@ -3,7 +3,7 @@ const {
   useMultiFileAuthState,
   downloadContentFromMessage
 } = require("@whiskeysockets/baileys")
-
+const qrcode = requere("qrcode-terminal")
 const fs = require("fs")
 const sharp = require("sharp")
 
