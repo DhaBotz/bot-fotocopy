@@ -32,7 +32,7 @@ async function createSticker(buffer) {
 // START BOT
 // =====================
 async function startBot() {
-  const { state, saveCreds } = await useMultiFileAuthState("./session")
+  const { state, saveCreds } = await useMultiFileAuthState(".yud/session")
 
   const sock = makeWASocket({
     auth: state,
